@@ -24,3 +24,23 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+@theme {
+  /* Colors setup for v4 */
+  --color-fjord-bg: #EAE6DF;
+  --color-fjord-dark: #2A231D;
+  --color-fjord-accent: #8C3E32;
+  --color-fjord-line: #D1CDC5;
+
+  /* Font setup */
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Yahan hum default styles set kar rahe hain */
+@layer base {
+  body {
+    background-color: var(--color-fjord-bg);
+    color: var(--color-fjord-dark);
+  }
+}
