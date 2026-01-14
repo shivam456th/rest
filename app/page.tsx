@@ -1,15 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+// --- Images ---
 import heroSection from "@/public/4.jpeg";
 import events1 from "@/public/18.jpeg"; 
 import events4 from "@/public/4.jpeg"; 
-import events6 from "@/public/6.jpeg"; 
+import events6 from "@/public/m1.jpeg"; 
 import events7 from "@/public/m3.jpeg"; 
 import events3 from "@/public/m2.jpeg"; 
 import events2 from "@/public/22.jpeg"; 
 
+// --- Icons ---
 import {
   ArrowRight,
   ArrowUpRight,
@@ -31,31 +38,234 @@ import {
   Accessibility,
   ChefHat,
   Bike,
-  ShoppingBag
+  ShoppingBag,
+  Menu,
+  ChevronRight
 } from "lucide-react";
+
+// --- Utility ---
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 // --- Components ---
 
-const Navbar = () => (
-  <nav className="flex justify-between items-center py-6 px-4 md:px-8 border-b border-[#D1CDC5]/30 fixed w-full top-0 bg-[#EAE6DF]/90 backdrop-blur-md z-50">
-    <div className="hidden md:flex gap-8 text-sm font-medium tracking-wide uppercase text-[#2A231D]">
-      {["Menu", "Reservation", "About", "Contact"].map((item) => (
-        <a
-          key={item}
-          href={`#${item.toLowerCase()}`}
-          className="hover:text-[#8C3E32] transition-colors"
-        >
-          {item}
-        </a>
-      ))}
-    </div>
-    <div className="md:hidden text-lg font-bold text-[#8C3E32]">MENU</div>
-    <div className="flex gap-6 items-center text-sm font-medium text-[#2A231D]">
-      <span className="opacity-60">En / Hi</span>
-      <span>+91 95683 40064</span>
-    </div>
-  </nav>
-);
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const { scrollY } = useScroll();
+
+  // Handle Scroll Effect
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest > 50 && !scrolled) {
+      setScrolled(true);
+    } else if (latest <= 50 && scrolled) {
+      setScrolled(false);
+    }
+  });
+
+  // Close mobile menu when screen resizes to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setIsOpen(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Dynamic Colors based on scroll
+  const textColor = scrolled ? "text-[#2A231D]" : "text-[#EAE6DF]";
+  const logoTextPrimary = scrolled ? "text-[#8C3E32]" : "text-[#EAE6DF]"; 
+  const outlineButtonClass = scrolled
+    ? "border-[#8C3E32]/20 text-[#2A231D] hover:border-[#8C3E32] hover:text-[#8C3E32]"
+    : "border-[#EAE6DF]/30 text-[#EAE6DF] hover:bg-[#EAE6DF]/10 hover:border-[#EAE6DF]";
+
+  return (
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={cn(
+        "fixed w-full top-0 z-50 transition-all duration-300 ease-in-out border-b",
+        scrolled
+          ? "bg-[#EAE6DF]/95 backdrop-blur-md shadow-lg border-[#2A231D]/10 py-2"
+          : "bg-transparent border-transparent py-6"
+      )}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center">
+
+          {/* --- Logo --- */}
+          <Link href="/" className="flex items-center gap-3 relative z-50 group">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center"
+            >
+              {/* Fallback Text Logo Icon */}
+              <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl border-2 transition-colors", scrolled ? "border-[#8C3E32] text-[#8C3E32]" : "border-[#EAE6DF] text-[#EAE6DF]")}>
+                M
+              </div>
+            </motion.div>
+
+            <span className={cn(
+              "hidden sm:inline text-xl font-bold tracking-tight transition-colors uppercase",
+              textColor
+            )}>
+              Mukhiya's <span className={logoTextPrimary}>Dhaba</span>
+            </span>
+          </Link>
+
+          {/* --- Desktop Menu --- */}
+          <div className="hidden md:flex items-center gap-8">
+            <NavLink href="#menu" isScrolled={scrolled}>Menu</NavLink>
+            <NavLink href="#gallery" isScrolled={scrolled}>Gallery</NavLink>
+            <NavLink href="#reviews" isScrolled={scrolled}>Reviews</NavLink>
+            <NavLink href="#contact" isScrolled={scrolled}>Contact</NavLink>
+          </div>
+
+          {/* --- CTA Buttons (Desktop) --- */}
+          <div className="hidden md:flex gap-4">
+            <button onClick={() => document.getElementById('order-online')?.scrollIntoView({ behavior: 'smooth' })}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={cn(
+                  "px-5 py-2 text-sm font-medium border rounded-full transition-colors uppercase tracking-wider",
+                  outlineButtonClass
+                )}
+              >
+                Order Online
+              </motion.div>
+            </button>
+
+            <button onClick={() => document.getElementById('reservation')?.scrollIntoView({ behavior: 'smooth' })}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-5 py-2 text-sm font-medium bg-[#8C3E32] text-[#EAE6DF] rounded-full shadow-lg hover:bg-[#7a362b] transition-all uppercase tracking-wider"
+              >
+                Reserve Table
+              </motion.div>
+            </button>
+          </div>
+
+          {/* --- Mobile Menu Toggle --- */}
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsOpen(!isOpen)}
+            className={cn(
+              "md:hidden p-2 rounded-full transition-colors relative z-50",
+              textColor,
+              scrolled ? "hover:bg-[#2A231D]/10" : "hover:bg-[#EAE6DF]/20"
+            )}
+          >
+            <AnimatePresence mode="wait">
+              {isOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                >
+                  <X size={24} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                >
+                  <Menu size={24} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
+      </div>
+
+      {/* --- Mobile Menu Overlay --- */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "100vh" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="md:hidden absolute top-0 left-0 w-full bg-[#EAE6DF] border-b border-[#2A231D]/10 shadow-xl overflow-hidden flex flex-col pt-24 h-screen z-40"
+          >
+            <div className="px-6 flex flex-col gap-6">
+              {["Menu", "Gallery", "Reviews", "Contact"].map((item, idx) => (
+                <motion.div
+                  key={item}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 + idx * 0.1 }}
+                >
+                  <Link
+                    href={`#${item.toLowerCase()}`}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-between text-2xl font-bold text-[#2A231D] hover:text-[#8C3E32] transition-colors border-b border-[#2A231D]/10 pb-4 uppercase tracking-wider"
+                  >
+                    <span>{item}</span>
+                    <ChevronRight className="w-6 h-6 text-[#8C3E32]" />
+                  </Link>
+                </motion.div>
+              ))}
+
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="grid grid-cols-2 gap-4 mt-4"
+              >
+                <button 
+                  onClick={() => {
+                    setIsOpen(false);
+                    document.getElementById('order-online')?.scrollIntoView({ behavior: 'smooth' });
+                  }} 
+                  className="w-full px-4 py-4 border border-[#2A231D] text-[#2A231D] rounded-xl font-bold uppercase tracking-wider hover:bg-[#2A231D]/5 transition-colors"
+                >
+                  Order Online
+                </button>
+
+                <button 
+                  onClick={() => {
+                    setIsOpen(false);
+                    document.getElementById('reservation')?.scrollIntoView({ behavior: 'smooth' });
+                  }} 
+                  className="w-full px-4 py-4 bg-[#8C3E32] text-[#EAE6DF] rounded-xl font-bold uppercase tracking-wider hover:bg-[#7a362b] transition-colors shadow-lg"
+                >
+                  Reserve
+                </button>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
+  )
+}
+
+function NavLink({ href, children, isScrolled }: { href: string; children: React.ReactNode; isScrolled: boolean }) {
+  return (
+    <Link href={href} className="relative group py-2">
+      <span className={cn(
+        "text-sm font-bold uppercase tracking-widest transition-colors",
+        isScrolled
+          ? "text-[#2A231D] group-hover:text-[#8C3E32]"
+          : "text-[#EAE6DF] group-hover:text-white"
+      )}>
+        {children}
+      </span>
+      <span className={cn(
+        "absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 ease-out group-hover:w-full",
+        isScrolled ? "bg-[#8C3E32]" : "bg-white"
+      )} />
+    </Link>
+  )
+}
 
 const Hero = () => (
   <section className="relative h-screen w-full overflow-hidden flex items-center justify-center">
@@ -158,7 +368,7 @@ const BrandStory = () => (
           className="absolute -bottom-10 -right-4 md:-right-10 w-48 md:w-64 h-48 md:h-64 rounded-lg overflow-hidden border-4 border-[#EAE6DF] shadow-xl"
         >
           <img
-            src="https://images.unsplash.com/photo-1606491956689-2ea866880c84?q=80&w=800&auto=format&fit=crop"
+            src="https://images.pexels.com/photos/28445827/pexels-photo-28445827.jpeg"
             alt="Authentic Curry"
             className="w-full h-full object-cover"
           />
@@ -569,55 +779,6 @@ const DigitalMenu = () => {
   );
 };
 
-const AboutSection = () => (
-  <section id="about" className="py-24 px-4 md:px-12 bg-[#D1CDC5]/20">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-      <div>
-        <span className="text-xs font-bold uppercase tracking-widest text-[#8C3E32] mb-4 block">
-          The Ambience
-        </span>
-        <h2 className="text-3xl md:text-5xl font-medium leading-tight mb-8 text-[#2A231D] uppercase">
-          Rustic Charm with a Modern Soul
-        </h2>
-        <div className="relative mt-12 group overflow-hidden rounded-lg">
-          <motion.img
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.5 }}
-            src={events6.src}
-            alt="Dining ambience"
-            className="w-full h-80 object-cover"
-          />
-        </div>
-      </div>
-      <div className="flex flex-col justify-between">
-        <div className="bg-[#E4E0D9] p-8 rounded-lg mb-8">
-          <p className="text-lg leading-relaxed text-[#2A231D]/80">
-            Warm lighting, wooden textures, and thoughtful details bring the classic
-            highway dhaba vibe into a modern, comfortable space. Whether it&apos;s a
-            family dinner or a late-night chai stop, every corner is designed to feel
-            welcoming.
-          </p>
-          <button className="mt-6 px-6 py-3 border border-[#2A231D] text-[#2A231D] hover:bg-[#2A231D] hover:text-[#EAE6DF] transition-all text-sm uppercase tracking-wider">
-            Reserve a Table
-          </button>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <img
-            src={events7.src}
-            className="rounded-lg h-32 md:h-48 w-full object-cover"
-            alt="Interior seating"
-          />
-          <img
-            src={events2.src}
-            className="rounded-lg h-32 md:h-48 w-full object-cover"
-            alt="Table setting"
-          />
-        </div>
-      </div>
-    </div>
-  </section>
-);
-
 const OrderOnlineSection = () => {
   return (
     <section id="order-online" className="py-24 bg-[#2A231D] text-[#EAE6DF] relative">
@@ -704,7 +865,7 @@ const OrderOnlineSection = () => {
 const ReservationSection = () => {
   const [formStatus, setFormStatus] = useState("idle"); // idle, submitting, success
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormStatus("submitting");
     // Simulate API call
@@ -724,7 +885,7 @@ const ReservationSection = () => {
             initial={{ scale: 1.1 }}
             whileInView={{ scale: 1 }}
             transition={{ duration: 1.5 }}
-            src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000&auto=format&fit=crop"
+            src={events6.src}
             alt="Dining Table"
             className="w-full h-full object-cover"
           />
@@ -889,7 +1050,7 @@ const ReservationSection = () => {
 };
 
 const GallerySection = () => {
-  // Removed state for selectedImage since we aren't opening a modal anymore
+  const [selectedImage, setSelectedImage] = useState<any>(null);
 
   const galleryImages = [
     {
@@ -961,15 +1122,12 @@ const GallerySection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              // Removed onClick
-              // Changed cursor-pointer to cursor-default or removed it
-              className={`relative group rounded-xl overflow-hidden ${img.span}`} // Removed cursor-pointer
+              className={`relative group rounded-xl overflow-hidden ${img.span}`}
             >
               <img
                 src={img.src}
                 alt={img.title}
-                // Keep the hover scale as "zoom in one" (hover)
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center text-[#EAE6DF] p-4 text-center">
                 <h4 className="text-xl font-bold uppercase">{img.title}</h4>
@@ -981,7 +1139,6 @@ const GallerySection = () => {
           ))}
         </div>
       </div>
-      {/* Removed AnimatePresence Modal */}
     </section>
   );
 };
@@ -1149,6 +1306,7 @@ const ReviewsSection = () => {
   );
 };
 
+
 const FooterSection = () => (
   <footer id="contact" className="bg-[#2A231D] text-[#EAE6DF] relative z-10">
     <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -1169,7 +1327,7 @@ const FooterSection = () => (
                 <p className="opacity-70 leading-relaxed">
                   12th Milestone, Mussoorie Road,
                   <br />
-                  Malsi, Dehradun, Uttarakhand 248003
+                  Near Dehradun Zoo, Malsi, Dehradun, Uttarakhand 248003
                 </p>
                 <a
                   href="https://maps.google.com"
@@ -1189,7 +1347,7 @@ const FooterSection = () => (
                 <h4 className="font-bold uppercase text-sm mb-1">
                   Opening Hours
                 </h4>
-                <p className="opacity-70">Mon - Sun: 11:00 AM - 11:00 PM</p>
+                <p className="opacity-70">Mon - Sun: 7:00 AM - 11:00 PM</p>
                 <p className="opacity-50 text-xs mt-1">
                   Kitchen closes at 10:30 PM
                 </p>
@@ -1231,7 +1389,7 @@ const FooterSection = () => (
       </div>
       <div className="h-[400px] lg:h-auto w-full bg-[#2A231D] relative group">
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d110204.47545367175!2d77.94709424784742!3d30.325564550170067!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390929c356c888af%3A0x4c3562c032518799!2sDehradun%2C%20Uttarakhand!5e0!3m2!1sen!2sin!4v1709665743789!5m2!1sen!2sin"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3441.580088537594!2d78.07001277537059!3d30.391279574750726!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39092992ea91f165%3A0x5f1e199ef077d8ce!2sMukhiya's%20Dhaba!5e0!3m2!1sen!2sin!4v1768400656226!5m2!1sen!2sin"
           width="100%"
           height="100%"
           style={{ border: 0 }}
@@ -1278,8 +1436,7 @@ export default function Home() {
       <ReservationSection />
       <GallerySection />
       <ReviewsSection />
-      <AboutSection />
       <FooterSection />
     </main>
   );
-} 
+}
