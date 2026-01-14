@@ -4,13 +4,8 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroSection from "@/public/4.jpeg";
 import events1 from "@/public/18.jpeg";
-// Note: Ensure you have this image in your public folder
-import events4 from "@/public/4.jpeg"; 
-import events6 from "@/public/6.jpeg"; 
-import events7 from "@/public/m3.jpeg"; 
-import events3 from "@/public/m2.jpeg"; 
-import events2 from "@/public/22.jpeg"; 
-
+// Note: Ensure you have this image in your public folder or change the import
+import events4 from "@/public/events4.jpeg"; 
 
 import {
   ArrowRight,
@@ -657,7 +652,7 @@ const OrderOnlineSection = () => {
 const ReservationSection = () => {
   const [formStatus, setFormStatus] = useState("idle"); // idle, submitting, success
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormStatus("submitting");
     // Simulate API call
@@ -842,12 +837,12 @@ const ReservationSection = () => {
 };
 
 const GallerySection = () => {
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState<any>(null);
 
   const galleryImages = [
     {
       id: 1,
-      src: events4.src,
+      src: events1.src,
       category: "Night Ambience",
       title: "Evenings under the Stars",
       span: "md:col-span-2 md:row-span-2",
@@ -861,28 +856,28 @@ const GallerySection = () => {
     },
     {
       id: 3,
-      src: events3.src,
+      src: "https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=800&auto=format&fit=crop",
       category: "Family Moments",
       title: "Making Memories",
       span: "md:col-span-1 md:row-span-1",
     },
     {
       id: 4,
-      src: events2.src,
+      src: events4.src,
       category: "Authentic Thalis",
       title: "The Royal Feast",
       span: "md:col-span-2 md:row-span-1",
     },
     {
       id: 5,
-      src: events6.src,
+      src: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=800&auto=format&fit=crop",
       category: "Interiors",
       title: "Rustic & Modern",
       span: "md:col-span-1 md:row-span-1",
     },
     {
       id: 6,
-      src: events7.src,
+      src: "https://images.unsplash.com/photo-1534939561126-855f8665b53e?q=80&w=800&auto=format&fit=crop",
       category: "Outdoor Seating",
       title: "Nature's Company",
       span: "md:col-span-1 md:row-span-1",
@@ -1098,6 +1093,54 @@ const ReviewsSection = () => {
   );
 };
 
+const AboutSection = () => (
+  <section className="py-24 px-4 md:px-12 bg-[#D1CDC5]/20">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+      <div>
+        <span className="text-xs font-bold uppercase tracking-widest text-[#8C3E32] mb-4 block">
+          The Ambience
+        </span>
+        <h2 className="text-3xl md:text-5xl font-medium leading-tight mb-8 text-[#2A231D] uppercase">
+          Rustic Charm with a Modern Soul
+        </h2>
+        <div className="relative mt-12 group overflow-hidden rounded-lg">
+          <motion.img
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.5 }}
+            src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&q=80&w=1000"
+            alt="Salad Dish"
+            className="w-full object-cover"
+          />
+        </div>
+      </div>
+      <div className="flex flex-col justify-between">
+        <div className="bg-[#E4E0D9] p-8 rounded-lg mb-8">
+          <p className="text-lg leading-relaxed text-[#2A231D]/80">
+            Pleasant wooden finishes, natural fabrics and traditional decor
+            elements will make you feel at home. We have created an atmosphere
+            where every guest can relax and enjoy the taste.
+          </p>
+          <button className="mt-6 px-6 py-3 border border-[#2A231D] text-[#2A231D] hover:bg-[#2A231D] hover:text-[#EAE6DF] transition-all text-sm uppercase tracking-wider">
+            Reserve a Table
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <img
+            src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80&w=500"
+            className="rounded-lg h-32 md:h-48 w-full object-cover"
+            alt="Interior"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1514362545857-3bc16549766b?auto=format&fit=crop&q=80&w=500"
+            className="rounded-lg h-32 md:h-48 w-full object-cover"
+            alt="Table setting"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
 const FooterSection = () => (
   <footer id="contact" className="bg-[#2A231D] text-[#EAE6DF] relative z-10">
     <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -1227,6 +1270,7 @@ export default function Home() {
       <ReservationSection />
       <GallerySection />
       <ReviewsSection />
+      <AboutSection />
       <FooterSection />
     </main>
   );
